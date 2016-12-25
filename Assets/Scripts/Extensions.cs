@@ -256,4 +256,8 @@ public static class Extensions
     public static Vector2 Clamp(this Vector2 v, Vector2 max) {
         return Clamp(v, Vector2.zero, max);
     }
+
+    public static double Rnd(double min, double max) {
+        return (double)(UnityEngine.Random.Range((float)min, (float)max));
+    }
 }
