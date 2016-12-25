@@ -34,7 +34,11 @@ public class GameGenerator : MonoBehaviour {
     public void Recalculate() {
         humanFactoredGameSpeed = lifecyclePhases.Sum(v => v.x * Math.Pow(v.y, idleLogarithmicPenalty)) / lifecyclePhases.Sum(v => v.x);
         expectedGameDuration = humanFactoredGameSpeed * minGameDuration;
+    }
 
+    [ContextMenu("Copy")]
+    public void Copy() {
+        names = GetComponent<NamesList>().names;
     }
 
     public void Start() {
