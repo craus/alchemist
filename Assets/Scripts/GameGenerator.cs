@@ -90,8 +90,9 @@ public class GameGenerator : MonoBehaviour {
             }
             reaction.time = MultiplierToTime((float)(productsWeight / reagentsWeight));
             if (!Bad(reaction) && !tooMuchTries) {
-                Debug.LogFormat("[{2}], {0} - {1}, [{3}]", minAcceptableMultiplier, maxAcceptableMultiplier, recommendedTime, reaction.time); 
-                //Debug.Log(reaction.time);
+                //Debug.LogFormat("[{2}], {0} - {1}, [{3}]", minAcceptableMultiplier, maxAcceptableMultiplier, recommendedTime, reaction.time); 
+                reaction.products = reaction.products.OrderBy(p => p.weight).ToList();
+                reaction.reagents = reaction.reagents.OrderBy(p => p.weight).ToList();
                 return reaction;
             }
         }
@@ -103,6 +104,8 @@ public class GameGenerator : MonoBehaviour {
     public void Recalculate() {
         humanFactoredGameSpeed = lifecyclePhases.Sum(v => v.x / Math.Pow(v.y, idleLogarithmicPenalty)) / lifecyclePhases.Sum(v => v.x);
         expectedGameDuration = minGameDuration / humanFactoredGameSpeed;
+
+        images = Resources.LoadAll<Sprite>("ResourceImages").ToList();
     }
 
     [ContextMenu("Test")]
