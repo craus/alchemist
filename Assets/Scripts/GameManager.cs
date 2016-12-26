@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour {
 
     public void Start() {
         game = generator.CreateGame();
+        RefreshUI();
+    }
+
+    public void RefreshUI() {
         reactions.Children().ForEach(c => Destroy(c.gameObject));
         game.reactions.ForEach(r => {
             var reaction = Instantiate(reactionPrefab);
