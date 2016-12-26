@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour {
             reaction.transform.SetParent(reactions);
             reaction.reaction = r;
         });
+        RefreshResourcesUI();
+    }
+
+    public void RefreshResourcesUI() {
         resources.Children().ForEach(r => Destroy(r.gameObject));
         game.currentResources.ForEach(r => {
             var resource = Instantiate(resourcePrefab);

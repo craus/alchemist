@@ -10,4 +10,8 @@ public class Resource {
     public string name;
     public Sprite image;
     public Color color;
+
+    public override string ToString() {
+        return String.Format("{0} ({1})", name, weight);
+    }
 }
