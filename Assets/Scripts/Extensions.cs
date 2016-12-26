@@ -240,6 +240,10 @@ public static class Extensions
         return collection[UnityEngine.Random.Range(0, collection.Count)];
     }
 
+    public static T Rnd<T>(this List<T> collection, int from, int to) {
+        return collection[UnityEngine.Random.Range(from, to)];
+    }
+
     public static Vector2 Scaled(this Vector2 v, Vector2 scale) {
         v.Scale(scale);
         return v;
@@ -259,5 +263,13 @@ public static class Extensions
 
     public static double Rnd(double min, double max) {
         return (double)(UnityEngine.Random.Range((float)min, (float)max));
+    }
+
+    public static float GaussianRnd() {
+        float sum = 0;
+        for (int i = 0; i < 12; i++) {
+            sum += UnityEngine.Random.Range(-1f, 1f);
+        }
+        return sum;
     }
 }

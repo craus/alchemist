@@ -3642,9 +3642,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb6d236528eb0534f81d21cc026884a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generator: {fileID: 0}
+  generator: {fileID: 1927057875}
   game:
     resources: []
+    reactions: []
 --- !u!1 &811915817
 GameObject:
   m_ObjectHideFlags: 0
@@ -5236,6 +5237,19 @@ Prefab:
     - target: {fileID: 22441848, guid: 800186aa48135584d9edbf31c5ca99f9, type: 2}
       propertyPath: m_SizeDelta.y
       value: -0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 11477890, guid: 800186aa48135584d9edbf31c5ca99f9, type: 2}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 46f13b18c616fc44384cb7b3066cb9d3,
+        type: 3}
+    - target: {fileID: 11477890, guid: 800186aa48135584d9edbf31c5ca99f9, type: 2}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11477890, guid: 800186aa48135584d9edbf31c5ca99f9, type: 2}
+      propertyPath: m_Color.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 800186aa48135584d9edbf31c5ca99f9, type: 2}
@@ -8394,6 +8408,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66d9b9d24c3180d418cbfbee7af98d58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  philosophersStone:
+    weight: 0
+    name: "\u0424\u0438\u043B\u043E\u0441\u043E\u0444\u0441\u043A\u0438\u0439 \u043A\u0430\u043C\u0435\u043D\u044C"
+    image: {fileID: 21300000, guid: 46f13b18c616fc44384cb7b3066cb9d3, type: 3}
+    color: {r: 1, g: 0.9724138, b: 0, a: 0}
   names:
   - "\u0414\u0440\u0430\u043A\u043E\u043D\u0438\u0439 \u043A\u043E\u0440\u043C"
   - "\u041F\u0442\u0438\u0447\u044C\u0435 \u043C\u043E\u043B\u043E\u043A\u043E"
@@ -8445,15 +8464,20 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 881f34fb69b120546a5a89cc46cb3f6a, type: 3}
   - {fileID: 21300000, guid: e48bd3ff9062bf948bd6f197e14d4d76, type: 3}
   resourceCount: 40
-  minWeight: 1e-250
-  maxWeight: 1e+250
+  reactionCount: 100
+  minWeight: 1
+  maxWeight: 10000
+  doublingTime: 180
+  idleLogarithmicPenalty: 0.25
   minReactionDuration: 1
   maxReactionDuration: 1000000
   minGameDuration: 10000000
-  idleLogarithmicPenalty: 0.25
-  lifecyclePhases: []
-  humanFactoredGameSpeed: 0
-  expectedGameDuration: 0
+  lifecyclePhases:
+  - {x: 14400, y: 1}
+  - {x: 36000, y: 3600}
+  - {x: 500000, y: 86400}
+  humanFactoredGameSpeed: 0.08759304011377259
+  expectedGameDuration: 114164321.58321288
   recommendedResourceCount: 0
 --- !u!1 &1944826750
 GameObject:
