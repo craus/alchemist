@@ -23,4 +23,8 @@ public class ReactionButton : MonoBehaviour {
             resourceIcon.transform.SetParent(formula);
         });
     }
+
+    public void DoReaction() {
+        //GameManager.instance.game.currentResources
+    }
 }

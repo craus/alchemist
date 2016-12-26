@@ -18,6 +18,7 @@ public class GameGenerator : MonoBehaviour {
     public double maxWeight = 1e250;
     public double doublingTime = 180;
     public double idleLogarithmicPenalty = 0.25;
+    public int startResources = 10;
 
     public double minReactionDuration = 1;
     public double maxReactionDuration = 1e6;
@@ -136,8 +137,13 @@ public class GameGenerator : MonoBehaviour {
             game.reactions.Add(CreateReaction(game));
         }
         game.reactions = game.reactions.OrderBy(r => r.reagents.Sum(re => re.weight)).ToList();
-        game.resources.Add(philosophersStone);
-        philosophersStone.weight = maxWeight;
+        //game.resources.Add(philosophersStone);
+        //philosophersStone.weight = maxWeight;
+
+        for (int i = 0; i < startResources; i++) {
+            game.currentResources.Add(game.resources.Rnd(0, 5));
+        }
+
         return game;
     }
 }
