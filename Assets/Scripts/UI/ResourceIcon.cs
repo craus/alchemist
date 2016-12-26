@@ -13,4 +13,12 @@ public class ResourceIcon : MonoBehaviour {
         image.color = resource.color;
         amountCircle.SetActive(false);
     }
+
+    public void OnMouseOver() {
+        GameManager.instance.status.text = resource.name;
+    }
+
+    public void OnMouseExit() {
+        GameManager.instance.status.text = "";
+    }
 }

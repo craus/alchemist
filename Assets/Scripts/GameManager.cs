@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
     public Transform resources;
     public ReactionButton reactionPrefab;
     public ResourceIcon resourcePrefab;
+    public Text status;
 
     public void Awake() {
         instance = this;
@@ -39,5 +40,9 @@ public class GameManager : MonoBehaviour {
             resource.resource = r;
             resource.transform.SetParent(resources);
         });
+    }
+
+    public void Repaint() {
+
     }
 }
