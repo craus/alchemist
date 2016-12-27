@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour {
     public ResourceIcon resourcePrefab;
     public Text status;
 
+    public List<ReactionButton> reactionButtons;
+
     public void Awake() {
         instance = this;
     }
@@ -27,6 +29,7 @@ public class GameManager : MonoBehaviour {
         reactions.Children().ForEach(c => Destroy(c.gameObject));
         game.reactions.ForEach(r => {
             var reaction = Instantiate(reactionPrefab);
+            reactionButtons.Add(reaction);
             reaction.transform.SetParent(reactions);
             reaction.reaction = r;
         });
@@ -43,9 +46,8 @@ public class GameManager : MonoBehaviour {
                 resource.transform.SetParent(resources);
             }
         });
-    }
-
-    public void Repaint() {
-
+        //reactionButtons.ForEach(rb => {
+        //    rb.gameObject.SetActive(rb.Doable());
+        //});
     }
 }

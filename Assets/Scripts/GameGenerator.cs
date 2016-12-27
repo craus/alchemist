@@ -11,6 +11,10 @@ public class GameGenerator : MonoBehaviour {
 
     public Resource philosophersStone;
     public List<string> names;
+    public Material whiteImagesMaterial;
+    public Material blackImagesMaterial;
+    public List<Sprite> whiteImages;
+    public List<Sprite> blackImages;
     public List<Sprite> images;
     public int resourceCount = 40;
     public int reactionCount = 100;
@@ -33,7 +37,13 @@ public class GameGenerator : MonoBehaviour {
         var resource = new Resource();
         resource.name = names.Rnd();
         resource.image = images.Rnd();
-        resource.color = UnityEngine.Random.ColorHSV();
+        if (whiteImages.Contains(resource.image)) {
+            resource.material = whiteImagesMaterial;
+            resource.color = UnityEngine.Random.ColorHSV();
+        } else {
+            resource.material = blackImagesMaterial;
+            resource.color = UnityEngine.Random.ColorHSV(0, 1, 0, 1, 0, 0.7f);
+        }
         resource.weight = Math.Exp(Extensions.Rnd(Math.Log(minWeight), Math.Log(maxWeight)));
         return resource;
     }
@@ -115,7 +125,9 @@ public class GameGenerator : MonoBehaviour {
         humanFactoredGameSpeed = lifecyclePhases.Sum(v => v.x / Math.Pow(v.y, idleLogarithmicPenalty)) / lifecyclePhases.Sum(v => v.x);
         expectedGameDuration = minGameDuration / humanFactoredGameSpeed;
 
-        images = Resources.LoadAll<Sprite>("ResourceImages").ToList();
+        blackImages = Resources.LoadAll<Sprite>("ResourceImages/Black").ToList();
+        whiteImages = Resources.LoadAll<Sprite>("ResourceImages/White").ToList();
+        images = blackImages.Concat(whiteImages).ToList();
     }
 
     [ContextMenu("Test")]

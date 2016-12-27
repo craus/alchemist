@@ -28,8 +28,12 @@ public class ReactionButton : MonoBehaviour {
         });
     }
 
+    public bool Doable() {
+        return !reaction.reagents.Keys.Any(r => reaction.reagents[r] > GameManager.instance.game.currentResources[r]);
+    }
+
     public void DoReaction() {
-        if (reaction.reagents.Keys.Any(r => reaction.reagents[r] > GameManager.instance.game.currentResources[r])) {
+        if (!Doable()) {
             return;
         }
         reaction.reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);

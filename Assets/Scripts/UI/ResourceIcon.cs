@@ -14,6 +14,7 @@ public class ResourceIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     void Start() {
         image.sprite = resource.image;
         image.color = resource.color;
+        image.material = resource.material;
         UpdateAmountCircle();
         if (amount == 0) {
             Destroy(gameObject);
