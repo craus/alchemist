@@ -35,10 +35,13 @@ public class GameManager : MonoBehaviour {
 
     public void RefreshResourcesUI() {
         resources.Children().ForEach(r => Destroy(r.gameObject));
-        game.currentResources.ForEach(r => {
-            var resource = Instantiate(resourcePrefab);
-            resource.resource = r;
-            resource.transform.SetParent(resources);
+        game.currentResources.Keys.ForEach(r => {
+            if (game.currentResources[r] > 0) {
+                var resource = Instantiate(resourcePrefab);
+                resource.resource = r;
+                resource.amount = game.currentResources[r];
+                resource.transform.SetParent(resources);
+            }
         });
     }
 

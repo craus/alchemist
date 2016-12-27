@@ -14,28 +14,26 @@ public class ReactionButton : MonoBehaviour {
         formula.Children().ForEach(c => Destroy(c.gameObject));
         reaction.reagents.ForEach(r => {
             var resourceIcon = Instantiate(resourcePrefab);
-            resourceIcon.resource = r;
+            resourceIcon.resource = r.Key;
+            resourceIcon.amount = r.Value;
             resourceIcon.transform.SetParent(formula);
         });
         var arrowIcon = Instantiate(arrowPrefab);
         arrowIcon.transform.SetParent(formula);
         reaction.products.ForEach(r => {
             var resourceIcon = Instantiate(resourcePrefab);
-            resourceIcon.resource = r;
+            resourceIcon.resource = r.Key;
+            resourceIcon.amount = r.Value;
             resourceIcon.transform.SetParent(formula);
         });
     }
 
     public void DoReaction() {
-        Map<Resource, int> cnts = new Map<Resource,int>();
-        GameManager.instance.game.currentResources.ForEach(cr => cnts[cr]++);
-        Map<Resource, int> reqcnts = new Map<Resource, int>();
-        reaction.reagents.ForEach(r => reqcnts[r]++);
-        if (reqcnts.Keys.Any(r => reqcnts[r] > cnts[r])) {
+        if (reaction.reagents.Keys.Any(r => reaction.reagents[r] > GameManager.instance.game.currentResources[r])) {
             return;
         }
-        reaction.reagents.ForEach(r => GameManager.instance.game.currentResources.Remove(r));
-        reaction.products.ForEach(r => GameManager.instance.game.currentResources.Add(r));
+        reaction.reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);
+        reaction.products.ForEach(r => GameManager.instance.game.currentResources[r.Key] += r.Value);
         GameManager.instance.RefreshResourcesUI();
     }
 }

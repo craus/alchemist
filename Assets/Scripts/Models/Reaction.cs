@@ -6,17 +6,17 @@ using System;
 
 [Serializable]
 public class Reaction {
-    public List<Resource> reagents = new List<Resource>();
-    public List<Resource> products = new List<Resource>();
+    public ResourceCollection reagents = new ResourceCollection();
+    public ResourceCollection products = new ResourceCollection();
     public float time;
 
     public Reaction From(params Resource[] reagents) {
-        this.reagents.AddRange(reagents);
+        reagents.ForEach(r => this.reagents[r]++);
         return this;
     }
 
     public Reaction To(params Resource[] products) {
-        this.products.AddRange(products);
+        products.ForEach(r => this.products[r]++);
         return this;
     }
 

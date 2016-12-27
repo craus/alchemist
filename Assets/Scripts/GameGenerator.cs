@@ -39,7 +39,7 @@ public class GameGenerator : MonoBehaviour {
     }
 
     public bool Bad(Reaction reaction) {
-        return Math.Abs(reaction.reagents.Sum(r => r.weight) - reaction.products.Sum(r => r.weight)) < 1e-9;
+        return Math.Abs(reaction.reagents.Sum(r => r.Key.weight * r.Value) - reaction.products.Sum(r => r.Key.weight * r.Value)) < 1e-9;
     }
 
     public float MultiplierToTime(double multiplier) {
@@ -62,10 +62,9 @@ public class GameGenerator : MonoBehaviour {
             int minReagent = Mathf.Clamp(pivotReagent - 5, 0, game.resources.Count - 1);
             int maxReagent = Mathf.Clamp(pivotReagent + 5, 0, game.resources.Count - 1) + 1;
             for (int i = 0; i < reagentsCount; i++) {
-                reaction.reagents.Add(game.resources.Rnd(minReagent, maxReagent));
+                reaction.reagents[game.resources.Rnd(minReagent, maxReagent)]++;
             }
-            reaction.reagents = reaction.reagents.OrderBy(r => r.weight).ToList();
-            double reagentsWeight = reaction.reagents.Sum(r => r.weight);
+            double reagentsWeight = reaction.reagents.Sum(r => r.Key.weight);
             double productsWeight = 0;
             float recommendedTime = (float)Math.Pow(10, Math.Exp(Extensions.GaussianRnd() * 0.27) * 1.4);
             double minAcceptableMultiplier = TimeToMultiplier(recommendedTime / 2);
@@ -75,18 +74,26 @@ public class GameGenerator : MonoBehaviour {
             int pivotProduct = pivotReagent + shift;
             int minProduct = Mathf.Clamp(pivotProduct - 5, 0, game.resources.Count - 1);
             int maxProduct = Mathf.Clamp(pivotProduct + 5, 0, game.resources.Count - 1);
+            HashSet<Resource> availableProducts = new HashSet<Resource>();
+            for (int i = 0; i < Math.Max(1, 5-reaction.reagents.Keys.Count); i++) {
+                availableProducts.Add(game.resources.Rnd(minProduct, maxProduct));
+            }
             bool tooMuchTries = false;
             for (int i = 0; i < TRIES; i++) {
                 if (reagentsWeight * minAcceptableMultiplier < productsWeight && productsWeight < reagentsWeight * maxAcceptableMultiplier) {
                     break;
                 }
                 if (productsWeight > reagentsWeight * recommendedMultiplier && reaction.products.Count > 1) {
-                    var resource = reaction.products.Rnd();
-                    reaction.products.Remove(resource);
+                    var resource = reaction.products.Keys.ToList().Rnd();
+                    reaction.products[resource]--;
+                    if (reaction.products[resource] < 0) {
+                        Debug.LogError("-");
+                        return new Reaction();
+                    }
                     productsWeight -= resource.weight;
                 } else {
-                    var resource = game.resources.Rnd(minProduct, maxProduct);
-                    reaction.products.Add(resource);
+                    var resource = availableProducts.ToList().Rnd();
+                    reaction.products[resource]++;
                     productsWeight += resource.weight;
                 }
                 if (i == TRIES-1) {
@@ -96,8 +103,6 @@ public class GameGenerator : MonoBehaviour {
             reaction.time = MultiplierToTime((float)(productsWeight / reagentsWeight));
             if (!Bad(reaction) && !tooMuchTries && reaction.products.Count <= 20) {
                 Debug.LogFormat("[{2}], {0} - {1}, [{3}] <<{4}>>", minAcceptableMultiplier, maxAcceptableMultiplier, recommendedTime, reaction.time, reaction.products.Count);
-                reaction.products = reaction.products.OrderBy(p => p.weight).ToList();
-                reaction.reagents = reaction.reagents.OrderBy(p => p.weight).ToList();
                 return reaction;
             }
         }
@@ -115,11 +120,13 @@ public class GameGenerator : MonoBehaviour {
 
     [ContextMenu("Test")]
     public void Test() {
-        float time = 1;
-        for (int i = 0; i < 100; i++) {
-            Debug.LogFormat("Time = {0}, Time` = {1}", time, MultiplierToTime(TimeToMultiplier(time)));
-            time *= 2;
-        }
+        ResourceCollection rc = new ResourceCollection();
+        var r = new Resource();
+        rc[r]++;
+        //rc[r]--;
+        Debug.LogFormat("rc {0}", rc);
+        Debug.LogFormat("rc[r] {0}", rc[r]);
+        Debug.LogFormat("rc {0}", rc);
     }
 
     public void Start() {
@@ -140,10 +147,10 @@ public class GameGenerator : MonoBehaviour {
         var reqRes = new HashSet<Resource>(game.resources);
 
         game.reactions.ForEach(r => {
-            int maxReagentIndex = r.reagents.Max(x => resOrder.IndexOf(x));
+            int maxReagentIndex = r.reagents.Max(x => resOrder.IndexOf(x.Key));
             r.products.ForEach(p => {
-                if (resOrder.IndexOf(p) > maxReagentIndex) {
-                    reqRes.Remove(p);
+                if (resOrder.IndexOf(p.Key) > maxReagentIndex) {
+                    reqRes.Remove(p.Key);
                 }
             });
         });
@@ -154,9 +161,9 @@ public class GameGenerator : MonoBehaviour {
             game.reactions.Add(new Reaction().From(x, x, x).To(r));
         });
 
-        game.reactions.Add(new Reaction().To(reqRes.First()));
+        game.reactions.Add(new Reaction().To(resOrder.First()));
 
-        game.reactions = game.reactions.OrderBy(r => r.reagents.Sum(re => re.weight)).ToList();
+        game.reactions = game.reactions.OrderBy(r => r.reagents.Weight()).ToList();
         //game.resources.Add(philosophersStone);
         //philosophersStone.weight = maxWeight;
 

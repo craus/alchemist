@@ -5,16 +5,21 @@ using System.Runtime.Serialization;
 
 public class Map<K, V> : Dictionary<K, V>
 {
+    public Func<V, bool> removeDefaultValues = v => false;
     private Func<V> defaultValueProvider = null;
 
     public new V this[K key] {
         get {
             if (!ContainsKey(key)) {
-                base[key] = GetDefaultValue();
+                return this[key] = GetDefaultValue();
             }
             return base[key];
         }
         set {
+            if (removeDefaultValues(value)) {
+                base.Remove(key);
+                return;
+            }
             base[key] = value;
         }
     }
