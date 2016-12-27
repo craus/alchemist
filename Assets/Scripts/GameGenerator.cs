@@ -136,13 +136,30 @@ public class GameGenerator : MonoBehaviour {
         for (int i = 0; i < reactionCount; i++) {
             game.reactions.Add(CreateReaction(game));
         }
+        var resOrder = new List<Resource>(game.resources);
+        var reqRes = new HashSet<Resource>(game.resources);
+
+        game.reactions.ForEach(r => {
+            int maxReagentIndex = r.reagents.Max(x => resOrder.IndexOf(x));
+            r.products.ForEach(p => {
+                if (resOrder.IndexOf(p) > maxReagentIndex) {
+                    reqRes.Remove(p);
+                }
+            });
+        });
+        reqRes.Remove(resOrder[0]);
+
+        reqRes.ForEach(r => {
+            var x = resOrder.cyclicNext(r, -1);
+            game.reactions.Add(new Reaction().From(x, x, x).To(r));
+        });
+
+        game.reactions.Add(new Reaction().To(reqRes.First()));
+
         game.reactions = game.reactions.OrderBy(r => r.reagents.Sum(re => re.weight)).ToList();
         //game.resources.Add(philosophersStone);
         //philosophersStone.weight = maxWeight;
 
-        for (int i = 0; i < startResources; i++) {
-            game.currentResources.Add(game.resources.Rnd(0, 5));
-        }
 
         return game;
     }
