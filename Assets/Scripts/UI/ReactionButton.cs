@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class ReactionButton : MonoBehaviour {
+    public Button button;
+    public Color usedColor;
     public Reaction reaction;
     public Transform formula;
     public ResourceIcon resourcePrefab;
@@ -39,5 +41,13 @@ public class ReactionButton : MonoBehaviour {
         reaction.reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);
         reaction.products.ForEach(r => GameManager.instance.game.currentResources[r.Key] += r.Value);
         GameManager.instance.RefreshResourcesUI();
+        reaction.used++;
+        if (reaction.used == 1) {
+            var colors = button.colors;
+            colors.normalColor *= usedColor;
+            colors.highlightedColor *= usedColor;
+            colors.pressedColor *= usedColor;
+            button.colors = colors;
+        }
     }
 }

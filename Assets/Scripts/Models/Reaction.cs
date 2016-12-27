@@ -9,6 +9,7 @@ public class Reaction {
     public ResourceCollection reagents = new ResourceCollection();
     public ResourceCollection products = new ResourceCollection();
     public float time;
+    public int used;
 
     public Reaction From(params Resource[] reagents) {
         reagents.ForEach(r => this.reagents[r]++);

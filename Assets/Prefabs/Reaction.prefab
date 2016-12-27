@@ -1281,10 +1281,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5eb88c9400143e448522ffc81c3caa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  button: {fileID: 11461994}
+  usedColor: {r: 1, g: 0.66, b: 1, a: 0.997}
   reaction:
-    reagents: []
-    products: []
     time: 0
+    used: 0
   formula: {fileID: 22448000}
   resourcePrefab: {fileID: 11409718, guid: 800186aa48135584d9edbf31c5ca99f9, type: 2}
   arrowPrefab: {fileID: 152862, guid: cac53882f2f3cae48965aa9e37c27bca, type: 2}
