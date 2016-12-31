@@ -3,8 +3,10 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.EventSystems;
 
-public class ReactionButton : MonoBehaviour {
+public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+{
     public Button button;
     public Color usedColor;
     public Reaction reaction;
@@ -49,5 +51,13 @@ public class ReactionButton : MonoBehaviour {
             colors.pressedColor *= usedColor;
             button.colors = colors;
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        GameManager.instance.status.text = string.Format("{0:0.0} -> {1:0.0} (x{2:0.0})", reaction.reagents.Weight(), reaction.products.Weight(), reaction.products.Weight()/reaction.reagents.Weight());
+    }
+
+    public void OnPointerExit(PointerEventData eventData) {
+        GameManager.instance.status.text = "";
     }
 }

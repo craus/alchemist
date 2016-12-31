@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour {
     public static GameManager instance;
 
-    public GameGenerator generator;
+    public AbstractGameGenerator generator;
     public Game game;
     public Transform reactions;
     public Transform resources;
@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviour {
     public void Start() {
         game = generator.CreateGame();
         RefreshUI();
+    }
+
+    [ContextMenu("Generate")]
+    public void Generate() {
+        game = generator.CreateGame();
     }
 
     public void RefreshUI() {

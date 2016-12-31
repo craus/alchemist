@@ -244,6 +244,33 @@ public static class Extensions
         return collection[UnityEngine.Random.Range(from, to)];
     }
 
+    public static List<T> RndSelection<T>(this List<T> collection, int cnt) {
+        if (cnt > collection.Count) {
+            return collection;
+        }
+        List<T> result = new List<T>();
+        int trash = collection.Count - cnt;
+        collection.ForEach(x => {
+            if (UnityEngine.Random.Range(0, cnt + trash) < cnt) {
+                result.Add(x);
+                --cnt;
+            } else {
+                --trash;
+            }
+        });
+        return result;
+    }
+
+    public static List<T> Range<T>(this List<T> collection, int from, int to) {
+        if (from < 0) {
+            from = 0;
+        }
+        if (to >= collection.Count) {
+            to = collection.Count - 1;
+        }
+        return collection.GetRange(from, to - from + 1);
+    }
+
     public static Vector2 Scaled(this Vector2 v, Vector2 scale) {
         v.Scale(scale);
         return v;

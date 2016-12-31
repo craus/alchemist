@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-public class GameGenerator : MonoBehaviour {
+public class GameGenerator : AbstractGameGenerator {
     const int TRIES = 10000;
     const int BIG_TRIES = 10;
 
@@ -23,6 +23,10 @@ public class GameGenerator : MonoBehaviour {
     public double doublingTime = 180;
     public double idleLogarithmicPenalty = 0.25;
     public int startResources = 10;
+    public int badWeightMultiplier = 4;
+    public double reactionMultiplier = 1.05;
+    public bool useReactionMultiplier = false;
+    public int resourceDelta = 5;
 
     public double minReactionDuration = 1;
     public double maxReactionDuration = 1e6;
@@ -48,7 +52,7 @@ public class GameGenerator : MonoBehaviour {
         return resource;
     }
 
-    public bool Bad(Reaction reaction) {
+    public bool Trivial(Reaction reaction) {
         return Math.Abs(reaction.reagents.Sum(r => r.Key.weight * r.Value) - reaction.products.Sum(r => r.Key.weight * r.Value)) < 1e-9;
     }
 
@@ -64,36 +68,46 @@ public class GameGenerator : MonoBehaviour {
         Reaction reaction = null;
         for (int j = 0; j < BIG_TRIES; j++) {
             if (j == BIG_TRIES - 1) {
-                Debug.LogWarning("Too much big tries");
+                Debug.LogError("Too much big tries");
             }
             reaction = new Reaction();
             int reagentsCount = (int)(Math.Exp(Extensions.GaussianRnd() * 0.27) * 1.6) + 1;
-            int pivotReagent = UnityEngine.Random.Range(0, game.resources.Count);
-            int minReagent = Mathf.Clamp(pivotReagent - 5, 0, game.resources.Count - 1);
-            int maxReagent = Mathf.Clamp(pivotReagent + 5, 0, game.resources.Count - 1) + 1;
-            for (int i = 0; i < reagentsCount; i++) {
-                reaction.reagents[game.resources.Rnd(minReagent, maxReagent)]++;
+
+            double recommendedReagentWeight = Math.Exp(Extensions.Rnd(Math.Log(minWeight), Math.Log(maxWeight)));
+            var pivotReagentResource = game.resources.LastOrDefault(r => r.weight < recommendedReagentWeight);
+            int pivotReagent = game.resources.IndexOf(pivotReagentResource);
+            int minReagent = Mathf.Clamp(pivotReagent - 2 * resourceDelta, 0, game.resources.Count - 1);
+            int maxReagent = Mathf.Clamp(pivotReagent, 0, game.resources.Count - 1) + 1;
+
+            List<Resource> availableReagents = game.resources.Range(from: minReagent, to: maxReagent).RndSelection(reagentsCount);
+            while(reaction.reagents.Weight() < recommendedReagentWeight) {
+                reaction.reagents[availableReagents.ToList().Rnd()]++;
             }
-            double reagentsWeight = reaction.reagents.Sum(r => r.Key.weight);
+            double reagentsWeight = reaction.reagents.Weight();
             double productsWeight = 0;
             float recommendedTime = (float)Math.Pow(10, Math.Exp(Extensions.GaussianRnd() * 0.27) * 1.4);
+            if (useReactionMultiplier) {
+                recommendedTime = MultiplierToTime(reactionMultiplier);
+            }
             double minAcceptableMultiplier = TimeToMultiplier(recommendedTime / 2);
+            //  Debug.LogFormat("minAcceptableMultiplier = {0}", minAcceptableMultiplier);
             double maxAcceptableMultiplier = TimeToMultiplier(recommendedTime * 2);
             double recommendedMultiplier = TimeToMultiplier(recommendedTime);
             int shift = (int)(Math.Log(recommendedMultiplier) / Math.Log(maxWeight / minWeight) * resourceCount);
             int pivotProduct = pivotReagent + shift;
-            int minProduct = Mathf.Clamp(pivotProduct - 5, 0, game.resources.Count - 1);
-            int maxProduct = Mathf.Clamp(pivotProduct + 5, 0, game.resources.Count - 1);
-            HashSet<Resource> availableProducts = new HashSet<Resource>();
-            for (int i = 0; i < Math.Max(1, 5-reaction.reagents.Keys.Count); i++) {
-                availableProducts.Add(game.resources.Rnd(minProduct, maxProduct));
-            }
+            int minProduct = Mathf.Clamp(pivotProduct - resourceDelta, 0, game.resources.Count - 1);
+            int maxProduct = Mathf.Clamp(pivotProduct + resourceDelta, 0, game.resources.Count - 1);
+            List<Resource> availableProducts = game.resources.Range(from: minProduct, to: maxProduct).RndSelection(Math.Max(1, 5 - reaction.reagents.Keys.Count));
+
+            double minProductsWeight = reagentsWeight * minAcceptableMultiplier + game.resources[0].weight;
+            double maxProductsWeight = reagentsWeight * maxAcceptableMultiplier + game.resources[0].weight;
+            double recommendedProductsWeight = reagentsWeight * recommendedMultiplier + game.resources[0].weight;
             bool tooMuchTries = false;
             for (int i = 0; i < TRIES; i++) {
-                if (reagentsWeight * minAcceptableMultiplier < productsWeight && productsWeight < reagentsWeight * maxAcceptableMultiplier) {
+                if (minProductsWeight < productsWeight && productsWeight < maxProductsWeight) {
                     break;
                 }
-                if (productsWeight > reagentsWeight * recommendedMultiplier && reaction.products.Count > 1) {
+                if (productsWeight > recommendedProductsWeight && reaction.products.Count > 1) {
                     var resource = reaction.products.Keys.ToList().Rnd();
                     reaction.products[resource]--;
                     if (reaction.products[resource] < 0) {
@@ -110,9 +124,22 @@ public class GameGenerator : MonoBehaviour {
                     tooMuchTries = true;
                 }
             }
+
             reaction.time = MultiplierToTime((float)(productsWeight / reagentsWeight));
-            if (!Bad(reaction) && !tooMuchTries && reaction.products.Count <= 20) {
-                Debug.LogFormat("[{2}], {0} - {1}, [{3}] <<{4}>>", minAcceptableMultiplier, maxAcceptableMultiplier, recommendedTime, reaction.time, reaction.products.Count);
+            if (!Trivial(reaction) && !tooMuchTries && reaction.products.Count <= 20 && !game.reactions.Any(other => other.NotWorse(reaction))) {
+                if (productsWeight < minProductsWeight) {
+                    Debug.LogFormat("productsWeight < minProductsWeight, tooMuchTries = {0}", tooMuchTries);
+                }
+                if (reaction.products.Weight() / reaction.reagents.Weight() < 1) {
+                    Debug.LogFormat("reaction.products.Weight() / reaction.reagents.Weight() < 1, tooMuchTries = {0}", tooMuchTries);
+                }
+                //Debug.LogFormat("[{2}], {0} - {1}, [{3}] <<{4}>>", minAcceptableMultiplier, maxAcceptableMultiplier, recommendedTime, reaction.time, reaction.products.Count);
+                //if (reaction.products.Weight() / reaction.reagents.Weight() < 1) {
+                //    Debug.LogFormat("{0}", reaction);
+                //    Debug.LogFormat("{0}", minProductsWeight);
+                //    Debug.LogFormat("{0}", maxProductsWeight);
+                //    Debug.LogFormat("{0}", reagentsWeight);
+                //}
                 return reaction;
             }
         }
@@ -145,7 +172,7 @@ public class GameGenerator : MonoBehaviour {
         Recalculate();
     }
 
-    public Game CreateGame() {
+    public override Game CreateGame() {
         Recalculate();
         var game = new Game();
         for (int i = 0; i < resourceCount; i++) {
@@ -158,22 +185,24 @@ public class GameGenerator : MonoBehaviour {
         var resOrder = new List<Resource>(game.resources);
         var reqRes = new HashSet<Resource>(game.resources);
 
-        game.reactions.ForEach(r => {
-            int maxReagentIndex = r.reagents.Max(x => resOrder.IndexOf(x.Key));
-            r.products.ForEach(p => {
-                if (resOrder.IndexOf(p.Key) > maxReagentIndex) {
-                    reqRes.Remove(p.Key);
-                }
-            });
-        });
+        //game.reactions.ForEach(r => {
+        //    int maxReagentIndex = r.reagents.Max(x => resOrder.IndexOf(x.Key));
+        //    r.products.ForEach(p => {
+        //        if (resOrder.IndexOf(p.Key) > maxReagentIndex) {
+        //            reqRes.Remove(p.Key);
+        //        }
+        //    });
+        //});
         reqRes.Remove(resOrder[0]);
 
         reqRes.ForEach(r => {
             var x = resOrder.cyclicNext(r, -1);
-            game.reactions.Add(new Reaction().From(x, x, x).To(r));
+            game.reactions.Add(new Reaction().From((int)(r.weight/x.weight+0.5), x).To(r));
         });
 
         game.reactions.Add(new Reaction().To(resOrder.First()));
+
+        game.reactions.RemoveAll(a => game.reactions.Any(b => b != a && b.NotWorse(a)));
 
         game.reactions = game.reactions.OrderBy(r => r.reagents.Weight()).ToList();
         //game.resources.Add(philosophersStone);
