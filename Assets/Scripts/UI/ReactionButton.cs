@@ -54,7 +54,7 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
-        GameManager.instance.status.text = string.Format("{0:0.0} -> {1:0.0} (x{2:0.0})", reaction.reagents.Weight(), reaction.products.Weight(), reaction.products.Weight()/reaction.reagents.Weight());
+        GameManager.instance.status.text = string.Format("{0:0.0000e0} -> {1:0.0000e0} (x{2:0.0000})", reaction.reagents.Weight(), reaction.products.Weight(), reaction.products.Weight() / reaction.reagents.Weight());
     }
 
     public void OnPointerExit(PointerEventData eventData) {

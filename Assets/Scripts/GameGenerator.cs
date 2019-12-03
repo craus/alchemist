@@ -174,6 +174,7 @@ public class GameGenerator : AbstractGameGenerator {
 
     public override Game CreateGame() {
         Recalculate();
+        //UnityEngine.Random.InitState(43);
         var game = new Game();
         for (int i = 0; i < resourceCount; i++) {
             game.resources.Add(CreateResource());

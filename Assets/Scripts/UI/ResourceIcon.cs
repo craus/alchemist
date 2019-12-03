@@ -35,7 +35,7 @@ public class ResourceIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     //}
 
     public void OnPointerEnter(PointerEventData eventData) {
-        GameManager.instance.status.text = string.Format("{0} {1:0.0}", resource.name, resource.weight);
+        GameManager.instance.status.text = string.Format("{0} {1:0.0000e0}", resource.name, resource.weight);
     }
 
     public void OnPointerExit(PointerEventData eventData) {
