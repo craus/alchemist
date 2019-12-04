@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
     public List<ReactionButton> reactionButtons;
 
     public SliderEventHandler sliderEventHandler = new SliderEventHandler();
+    public DiscreteController timeController;
 
     public void Awake() {
         instance = this;
@@ -57,5 +58,13 @@ public class GameManager : MonoBehaviour {
         //reactionButtons.ForEach(rb => {
         //    rb.gameObject.SetActive(rb.Doable());
         //});
+
+        GameStateChanged();
+    }
+
+    public void GameStateChanged() {
+        if (timeController != null) {
+            timeController.WorldChanged();
+        }
     }
 }

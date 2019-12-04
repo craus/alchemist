@@ -13,12 +13,14 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public Transform formula;
     public ResourceIcon resourcePrefab;
     public GameObject arrowPrefab;
+    public Manufacture manufacture;
 
     void OnEnable() {
         GameManager.instance.sliderEventHandler.AddSlider(slider);
     }
 
     void Start() {
+        manufacture = new Manufacture(reaction);
         formula.Children().ForEach(c => Destroy(c.gameObject));
         reaction.reagents.ForEach(r => {
             var resourceIcon = Instantiate(resourcePrefab);
@@ -44,8 +46,8 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (!Doable()) {
             return;
         }
-        reaction.reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);
-        reaction.products.ForEach(r => GameManager.instance.game.currentResources[r.Key] += r.Value);
+        reaction.StartReaction();
+        reaction.RetrieveReactionResults();
         GameManager.instance.RefreshResourcesUI();
         reaction.used++;
         if (reaction.used == 1) {
@@ -67,6 +69,7 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void SliderValueChangeCheck() {
         GameManager.instance.sliderEventHandler.OnValueChanged(slider);
+        manufacture.isProgress = slider.value > 0f;
     }
 
     void OnDisable() {

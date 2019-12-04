@@ -36,4 +36,11 @@ public class Reaction {
     public bool NotWorse(Reaction other) {
         return reagents.All(r => other.reagents[r.Key] >= r.Value) && other.products.All(p => products[p.Key]-reagents[p.Key] >= p.Value-other.reagents[p.Key]);
     }
+
+    public void StartReaction() {
+        reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);
+    }
+    public void RetrieveReactionResults() {
+        products.ForEach(r => GameManager.instance.game.currentResources[r.Key] += r.Value);
+    }
 }
