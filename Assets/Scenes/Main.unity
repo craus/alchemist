@@ -2172,6 +2172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 787523987}
   - component: {fileID: 787523988}
+  - component: {fileID: 787523989}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -2444,6 +2445,18 @@ MonoBehaviour:
   resourcePrefab: {fileID: 11409718, guid: 800186aa48135584d9edbf31c5ca99f9, type: 3}
   status: {fileID: 2062692260}
   reactionButtons: []
+--- !u!114 &787523989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787523986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dfc32ef7a8712043ae5ca7a6fd228cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &851732395
 PrefabInstance:
   m_ObjectHideFlags: 0
