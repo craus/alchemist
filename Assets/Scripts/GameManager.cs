@@ -16,11 +16,14 @@ public class GameManager : MonoBehaviour {
 
     public List<ReactionButton> reactionButtons;
 
+    public SliderEventHandler sliderEventHandler = new SliderEventHandler();
+
     public void Awake() {
         instance = this;
     }
 
     public void Start() {
+        //sliderEventHandler = new SliderEventHandler();
         game = generator.CreateGame();
         RefreshUI();
     }

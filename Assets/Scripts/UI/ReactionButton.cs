@@ -14,6 +14,10 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public ResourceIcon resourcePrefab;
     public GameObject arrowPrefab;
 
+    void OnEnable() {
+        GameManager.instance.sliderEventHandler.AddSlider(slider);
+    }
+
     void Start() {
         formula.Children().ForEach(c => Destroy(c.gameObject));
         reaction.reagents.ForEach(r => {
@@ -62,6 +66,10 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     }
 
     public void SliderValueChangeCheck() {
-        Debug.Log(slider.value);
+        GameManager.instance.sliderEventHandler.OnValueChanged(slider);
+    }
+
+    void OnDisable() {
+        GameManager.instance.sliderEventHandler.RemoveSlider(slider);
     }
 }
