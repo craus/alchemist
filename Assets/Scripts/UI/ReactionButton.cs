@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.EventSystems;
 
-public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
-{
+public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     public Button button;
+    public Slider slider;
     public Color usedColor;
     public Reaction reaction;
     public Transform formula;
@@ -59,5 +59,9 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerExit(PointerEventData eventData) {
         GameManager.instance.status.text = "";
+    }
+
+    public void SliderValueChangeCheck() {
+        Debug.Log(slider.value);
     }
 }
