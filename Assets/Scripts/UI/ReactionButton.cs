@@ -21,6 +21,9 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     void Start() {
         manufacture = new Manufacture(reaction);
+        manufacture.OnStopListener += () => {
+            slider.value = 0f;
+        };
         formula.Children().ForEach(c => Destroy(c.gameObject));
         reaction.reagents.ForEach(r => {
             var resourceIcon = Instantiate(resourcePrefab);
@@ -69,7 +72,10 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void SliderValueChangeCheck() {
         GameManager.instance.sliderEventHandler.OnValueChanged(slider);
-        manufacture.isProgress = slider.value > 0f;
+        manufacture.Effort = slider.value / GameManager.instance.sliderEventHandler.Summary;
+
+        //set in controller
+        //manufacture.isProgress = slider.value > 0f;
     }
 
     void OnDisable() {

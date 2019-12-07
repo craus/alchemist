@@ -10,6 +10,7 @@ public class Reaction {
     public ResourceCollection reagents = new ResourceCollection();
     public ResourceCollection products = new ResourceCollection();
     public float time;
+    public long startTime;
     public int used;
 
     public Reaction From(params Resource[] reagents) {
@@ -28,19 +29,19 @@ public class Reaction {
         return this;
     }
 
-    public Reaction In(float time) {
-        this.time = time;
-        return this;
-    }
+    //public Reaction In(float time) {
+    //    this.time = time;
+    //    return this;
+    //}
 
     public bool NotWorse(Reaction other) {
         return reagents.All(r => other.reagents[r.Key] >= r.Value) && other.products.All(p => products[p.Key]-reagents[p.Key] >= p.Value-other.reagents[p.Key]);
     }
 
     public void StartReaction() {
-        reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);
+        //reagents.ForEach(r => GameManager.instance.game.currentResources[r.Key] -= r.Value);
     }
     public void RetrieveReactionResults() {
-        products.ForEach(r => GameManager.instance.game.currentResources[r.Key] += r.Value);
+       //products.ForEach(r => GameManager.instance.game.currentResources[r.Key] += r.Value);
     }
 }

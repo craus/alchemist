@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.Serialization;
 
-public class Map<K, V> : Dictionary<K, V>
-{
+public class Map<K, V> : Dictionary<K, V> {
     public Func<V, bool> removeDefaultValues = v => false;
     private Func<V> defaultValueProvider = null;
 
@@ -32,7 +31,10 @@ public class Map<K, V> : Dictionary<K, V>
         }
     }
 
-    public Map(Func<V> defaultValueProvider = null) {
+    public Map(Func<V> defaultValueProvider = null) : base() {
+        this.defaultValueProvider = defaultValueProvider;
+    }
+    public Map(IDictionary<K, V> dictionary, Func<V> defaultValueProvider = null) : base(dictionary) {
         this.defaultValueProvider = defaultValueProvider;
     }
 

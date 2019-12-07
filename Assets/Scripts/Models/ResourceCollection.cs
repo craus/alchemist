@@ -12,6 +12,14 @@ public class ResourceCollection : Map<Resource, int> {
     }
 
     public ResourceCollection() {
+        Init();
+    }
+
+    public ResourceCollection(ResourceCollection rc) : base(rc) {
+        Init();
+    }
+
+    void Init() {
         removeDefaultValues = x => x == 0;
     }
 

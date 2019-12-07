@@ -299,4 +299,18 @@ public static class Extensions
         }
         return sum;
     }
+
+
+    public static T MinBy<T>(this IEnumerable<T> collection, Func<T, float> criteria) {
+        float best = float.PositiveInfinity;
+        T result = default(T);
+        foreach (T el in collection) {
+            float cand = criteria(el);
+            if (cand < best) {
+                result = el;
+                best = cand;
+            }
+        }
+        return result;
+    }
 }

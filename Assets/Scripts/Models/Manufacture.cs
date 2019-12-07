@@ -10,18 +10,35 @@ public class Manufacture {
     public float progressPercent;
     public bool isProgress;
 
-    private float performance = 3f;
+    private float performance = 3f* 10000000;
+
+    public float Effort = 0f;
+
+    public OnStop OnStopListener;
 
     public Manufacture(Reaction reaction) {
         this.reaction = reaction;
     }
 
-    public float EstimatedDeltaProgress(float deltaTime, float effort) {
-        return deltaTime * EstimatedSpeed(effort);
+    public float EstimatedDeltaProgress(long deltaTime) {
+        return deltaTime * EstimatedSpeed();
     }
 
-    public float EstimatedSpeed(float effort) {
-        return performance * effort;
+    public float EstimatedSpeed() {
+        return performance * Effort;
+    }
+    public void StartReaction() {
+        isProgress = true;
+        reaction.StartReaction();
     }
 
+    public void Stop() {
+        isProgress = false;
+        progressPercent = 0f;
+        if (OnStopListener != null) {
+            OnStopListener.Invoke();
+        }
+    }
+
+    public delegate void OnStop();
 }

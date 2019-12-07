@@ -9,7 +9,7 @@ public class ResourceIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public Text amountText;
     public GameObject amountCircle;
 
-    public int amount;
+    public long amount;
 
     void Start() {
         image.sprite = resource.image;
