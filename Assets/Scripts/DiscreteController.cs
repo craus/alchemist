@@ -36,13 +36,13 @@ public class DiscreteController : MonoBehaviour {
             stateChanged = true;
         }
         List<ReactionButton> activeList = GameManager.instance.reactionButtons.FindAll(b => b.slider.value > 0);
+        //TODO: order turn on depending proportion
         List<ReactionButton> toStartList = activeList.FindAll(b => !b.manufacture.isProgress).OrderByDescending(b => b.slider.value).ToList();
-        //incorrect action foreach if multiple manufactures started
         toStartList.ForEach(b => {
             if (b.Doable()) {
                 stateChanged = true;
                 b.manufacture.StartReaction();
-                b.manufacture.reaction.startTime = currentTime;
+                b.manufacture.startTime = currentTime;
             }
         });
         if (stateChanged) {
@@ -64,7 +64,9 @@ public class DiscreteController : MonoBehaviour {
     }
 
     private void ReInit(List<ReactionButton> activeList) {
+        int counter = 0;
         bool inProgress;
+        long nextTime = this.nextTime;
         do {
             inProgress = false;
             activeManufactureList = activeList.Select(b => b.manufacture).Where(m => m.isProgress).ToList();
@@ -72,11 +74,11 @@ public class DiscreteController : MonoBehaviour {
             activeManufactureList.ForEach((m) => {
                 m.reaction.products.ForEach(r => {
                     //-1
-                    map[r.Key].Add(new ResourceChange(r.Value, m.EstimatedSpeed(), m.reaction.startTime - 1, m));
+                    map[r.Key].Add(new ResourceChange(r.Value, m.EstimatedSpeed(), m.startTime - 1, m));
                 });
                 m.reaction.reagents.ForEach(r => {
                     //<0!!!!!
-                    map[r.Key].Add(new ResourceChange(r.Value, -m.EstimatedSpeed(), m.reaction.startTime, m));
+                    map[r.Key].Add(new ResourceChange(r.Value, -m.EstimatedSpeed(), m.startTime, m));
                 });
             });
 
@@ -88,7 +90,7 @@ public class DiscreteController : MonoBehaviour {
             ResourceChange rc = map.Values.Select(list => ResListMinByNexTtime(list)).MinBy(list2 => NextTimeChange(list2));
             //rc !=null to struct
             if (rc.parentManufacture != null) {
-                long nextTime = NextTimeChange(rc);
+                nextTime = NextTimeChange(rc);
                 string timeC = new DateTime(currentTime).ToLongTimeString();
                 string timeS = new DateTime(nextTime).ToLongTimeString();
                 Debug.Log(timeC);
@@ -109,23 +111,29 @@ public class DiscreteController : MonoBehaviour {
                     }
                 }
             }
+            if (counter++ > 1000) {
+                throw new Exception("ReInit loop");
+            }
         } while (inProgress);
+        this.nextTime = nextTime;
     }
-    static ResourceChange ResListMinByNexTtime(List<ResourceChange> list) {
+
+    private ResourceChange ResListMinByNexTtime(List<ResourceChange> list) {
         return list.MinBy(rc => NextTimeChange(rc));
     }
 
-    static long NextTimeChange(ResourceChange rc) {
-        return (long)Math.Ceiling(rc.startTime + rc.speed);
+    private long NextTimeChange(ResourceChange rc) {
+        return (long)Math.Ceiling(... currentTime - rc.startTime + rc.speed);
     }
 
     void MoveToNextTime(long nextTime) {
         //TODO: move
-        AddToResourceCollection(stateResources, nextTime);
+        ChangeResourcesInGame(stateResources, nextTime);
+        activeManufactureList.ForEach(m => m.Rewind(nextTime));
         stateStartTime = currentTime;
     }
 
-    ResourceCollection AddToResourceCollection(ResourceCollection rc, long nextTime) {
+    ResourceCollection ChangeResourcesInGame(ResourceCollection rc, long nextTime) {
         map.ForEach(p => {
             rc[p.Key] += ResourceChange.ListSum(p.Value, nextTime - stateStartTime);
         });
@@ -149,7 +157,7 @@ public class DiscreteController : MonoBehaviour {
         }
 
         public int Value(long deltaTime) {
-            return count * (int)Math.Floor(deltaTime / speed + startTime);
+            return count * (int)Math.Floor(deltaTime * speed + startTime);
         }
 
         public static int ListSum(List<ResourceChange> list, long deltaTime) {

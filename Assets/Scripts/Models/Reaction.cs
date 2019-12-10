@@ -9,8 +9,8 @@ using System.Linq;
 public class Reaction {
     public ResourceCollection reagents = new ResourceCollection();
     public ResourceCollection products = new ResourceCollection();
+    //duration?
     public float time;
-    public long startTime;
     public int used;
 
     public Reaction From(params Resource[] reagents) {

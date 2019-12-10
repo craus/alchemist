@@ -44,8 +44,11 @@ public class GameManager : MonoBehaviour {
         });
         RefreshResourcesUI();
     }
+    public void RefreshResourcesAfterIdle() {
+        RefreshResources();
+    }
 
-    public void RefreshResourcesUI() {
+    private void RefreshResources() {
         resources.Children().ForEach(r => Destroy(r.gameObject));
         game.currentResources.Keys.ForEach(r => {
             if (game.currentResources[r] > 0) {
@@ -58,7 +61,10 @@ public class GameManager : MonoBehaviour {
         //reactionButtons.ForEach(rb => {
         //    rb.gameObject.SetActive(rb.Doable());
         //});
+    }
 
+    public void RefreshResourcesUI() {
+        RefreshResources();
         GameStateChanged();
     }
 

@@ -7,6 +7,7 @@ using System.Text;
 public class Manufacture {
 
     public Reaction reaction;
+    public long startTime;
     public float progressPercent;
     public bool isProgress;
 
@@ -41,4 +42,8 @@ public class Manufacture {
     }
 
     public delegate void OnStop();
+
+    public void Rewind(long nextTime) {
+        throw new NotImplementedException();
+    }
 }
