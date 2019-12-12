@@ -55,7 +55,7 @@ public class DiscreteController : MonoBehaviour {
 
             //the same. Assignment is unnecessary
             //GameManager.instance.game.currentResources = stateResources;
-            GameManager.instance.RefreshResourcesUI();
+            GameManager.instance.RefreshResourcesAfterIdle();
         }
     }
 
@@ -101,7 +101,7 @@ public class DiscreteController : MonoBehaviour {
                     MoveToNextTime(nextTime);
                     inProgress = true;
                 }
-                if (rc.parentManufacture.reaction.reagents.Any(r => stateResources[r.Key] + ResourceChange.ListSum(map[r.Key], nextTime - stateStartTime) < 0)) {
+                if (rc.parentManufacture.reaction.reagents.Any(r => stateResources[r.Key] + ResourceChange.ListSum(map[r.Key], nextTime) < 0)) {
                     if (nextTime <= currentTime) {
                         inProgress = true;
                         rc.parentManufacture.Stop();
@@ -123,7 +123,7 @@ public class DiscreteController : MonoBehaviour {
     }
 
     private long NextTimeChange(ResourceChange rc) {
-        return (long)Math.Ceiling(... currentTime - rc.startTime + rc.speed);
+        return (long)(1 / rc.speed) + rc.startTime;
     }
 
     void MoveToNextTime(long nextTime) {
@@ -133,11 +133,12 @@ public class DiscreteController : MonoBehaviour {
         stateStartTime = currentTime;
     }
 
-    ResourceCollection ChangeResourcesInGame(ResourceCollection rc, long nextTime) {
+    ResourceCollection ChangeResourcesInGame(ResourceCollection rCol, long nextTime) {
         map.ForEach(p => {
-            rc[p.Key] += ResourceChange.ListSum(p.Value, nextTime - stateStartTime);
+            rCol[p.Key] += ResourceChange.ListSum(p.Value, nextTime);
+            p.Value.ForEach(rc => rc.MoveToTime(nextTime));
         });
-        return rc;
+        return rCol;
     }
 
     struct ResourceChange {
@@ -156,12 +157,17 @@ public class DiscreteController : MonoBehaviour {
             this.parentManufacture = parentManufacture;
         }
 
-        public int Value(long deltaTime) {
-            return count * (int)Math.Floor(deltaTime * speed + startTime);
+        public int Value(long nextTime) {
+            return count * (int)Math.Floor((nextTime - startTime) * speed);
         }
 
-        public static int ListSum(List<ResourceChange> list, long deltaTime) {
-            return list.Sum(rch => rch.Value(deltaTime));
+        public static int ListSum(List<ResourceChange> list, long nextTime) {
+            return list.Sum(rch => rch.Value(nextTime));
+        }
+
+        internal void MoveToTime(long nextTime) {
+            //TODO: for idler cases can be reworked
+            startTime = nextTime;
         }
     }
 }
