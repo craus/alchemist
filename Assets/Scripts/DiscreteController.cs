@@ -74,7 +74,7 @@ public class DiscreteController : MonoBehaviour {
             activeManufactureList.ForEach((m) => {
                 m.reaction.products.ForEach(r => {
                     //-1
-                    map[r.Key].Add(new ResourceChange(r.Value, m.EstimatedSpeed(), m.startTime - 1, m));
+                    map[r.Key].Add(new ResourceChange(r.Value, m.EstimatedSpeed(), m.startTime, m));
                 });
                 m.reaction.reagents.ForEach(r => {
                     //<0!!!!!
@@ -93,8 +93,8 @@ public class DiscreteController : MonoBehaviour {
                 nextTime = NextTimeChange(rc);
                 string timeC = new DateTime(currentTime).ToLongTimeString();
                 string timeS = new DateTime(nextTime).ToLongTimeString();
-                Debug.Log(timeC);
-                Debug.Log(timeS);
+                Debug.Log(timeC + "   " + currentTime);
+                Debug.Log(timeS + "   " + nextTime);
                 if (nextTime < currentTime) {
 
                     //changeState!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -129,15 +129,13 @@ public class DiscreteController : MonoBehaviour {
     void MoveToNextTime(long nextTime) {
         //TODO: move
         ChangeResourcesInGame(stateResources, nextTime);
+        activeManufactureList.ForEach(m => m.startTime = nextTime);
         activeManufactureList.ForEach(m => m.Rewind(nextTime));
         stateStartTime = currentTime;
     }
 
     ResourceCollection ChangeResourcesInGame(ResourceCollection rCol, long nextTime) {
-        map.ForEach(p => {
-            rCol[p.Key] += ResourceChange.ListSum(p.Value, nextTime);
-            p.Value.ForEach(rc => rc.MoveToTime(nextTime));
-        });
+        map.ForEach(p => rCol[p.Key] += ResourceChange.ListSum(p.Value, nextTime));
         return rCol;
     }
 
@@ -163,11 +161,6 @@ public class DiscreteController : MonoBehaviour {
 
         public static int ListSum(List<ResourceChange> list, long nextTime) {
             return list.Sum(rch => rch.Value(nextTime));
-        }
-
-        internal void MoveToTime(long nextTime) {
-            //TODO: for idler cases can be reworked
-            startTime = nextTime;
         }
     }
 }
