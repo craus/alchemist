@@ -5,12 +5,14 @@ using UnityEngine;
 using System.Linq;
 
 public class DiscreteController : MonoBehaviour {
+    static readonly long NEVER = DateTime.MaxValue.Ticks;
     bool loaded = false;
     bool stateChanged = false;
+    bool speedChanged = false;
 
     List<Manufacture> activeManufactureList;
     //Map<Resource, List<ResourceChange>> map;
-    long nextTime = DateTime.MaxValue.Ticks;
+    long nextTime = NEVER;
     long currentTime;
     long stateStartTime;
     ResourceCollection stateResources;
@@ -35,6 +37,9 @@ public class DiscreteController : MonoBehaviour {
         if (currentTime >= nextTime) {
             stateChanged = true;
         }
+        if (speedChanged) {
+            RecalculteEffortOnSpeedChange();
+        }
         List<ReactionButton> activeList = GameManager.instance.reactionButtons.FindAll(b => b.slider.value > 0);
         //TODO: order turn on depending proportion
         List<ReactionButton> toStartList = activeList.FindAll(b => !b.manufacture.isProgress).OrderByDescending(b => b.slider.value).ToList();
@@ -48,8 +53,11 @@ public class DiscreteController : MonoBehaviour {
             stateChanged = false;
 
 
-
-            ReInit(activeList);
+            if (activeList.Count > 0) {
+                ReInit(activeList);
+            } else {
+                nextTime = NEVER;
+            }
 
 
             //the same. Assignment is unnecessary
@@ -57,9 +65,13 @@ public class DiscreteController : MonoBehaviour {
             GameManager.instance.RefreshResourcesAfterIdle();
         }
     }
-
+    private void RecalculteEffortOnSpeedChange() {
+        speedChanged = false;
+        GameManager.instance.reactionButtons.ForEach(rb => rb.RecalculteEffort());
+    }
     public void WorldChanged() {
         stateChanged = true;
+        speedChanged = true;
     }
 
     private void ReInit(List<ReactionButton> activeList) {
@@ -100,18 +112,24 @@ public class DiscreteController : MonoBehaviour {
                 Debug.Log("ct" + timeC + "   " + currentTime);
                 Debug.Log("nt" + timeS + "   " + nextTime);
                 if (nextTime < currentTime) {
-
+                    bool speedChanged = false;
                     //changeState!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    activeManufactureList.ForEach(m => m.Rewind(nextTime));
-
-                    if (mf.reaction.reagents.Any(r => stateResources[r.Key] < 0)) {
-                            mf.Stop();
-                            activeManufactureList.Remove(mf);
+                    activeManufactureList.ForEach(m => {
+                        m.Rewind(nextTime);
+                        if (m.reaction.reagents.Any(r => stateResources[r.Key] < 0)) {
+                            m.Stop();
+                            activeManufactureList.Remove(m);
+                            speedChanged = true;
+                        }
+                    });
+                    if (speedChanged) {
+                        RecalculteEffortOnSpeedChange();
                     }
-
                     inProgress = true;
                 }
 
+            } else {
+                throw new Exception("WTF!!!");
             }
             if (counter++ > 1000) {
                 throw new Exception("ReInit loop");

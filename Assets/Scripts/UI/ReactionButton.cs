@@ -72,10 +72,10 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void SliderValueChangeCheck() {
         GameManager.instance.sliderEventHandler.OnValueChanged(slider);
-        manufacture.Effort = slider.value / GameManager.instance.sliderEventHandler.Summary;
+    }
 
-        //set in controller
-        //manufacture.isProgress = slider.value > 0f;
+    public void RecalculteEffort() {
+        manufacture.Effort = slider.value / GameManager.instance.sliderEventHandler.Summary;
     }
 
     void OnDisable() {
