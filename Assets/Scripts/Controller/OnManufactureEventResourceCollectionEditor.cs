@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 class OnManufactureEventResourceCollectionEditor : ManufactureListener {
 
@@ -17,6 +18,7 @@ class OnManufactureEventResourceCollectionEditor : ManufactureListener {
     }
 
     void ManufactureListener.OnIterationsChanged(Manufacture m, int iterations) {
+        Debug.Log("iterations " + iterations);
         m.reaction.reagents.ForEach(r => col[r.Key] -= (r.Value * iterations));
         m.reaction.products.ForEach(r => col[r.Key] += (r.Value * iterations));
     }
