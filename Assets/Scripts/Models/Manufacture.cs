@@ -16,7 +16,7 @@ public class Manufacture {
     public float Effort = 0f;
 
     public OnStop OnStopListener;
-
+    public ManufactureListener manufactureListener;
     public Manufacture(Reaction reaction) {
         this.reaction = reaction;
     }
@@ -28,14 +28,18 @@ public class Manufacture {
     public float EstimatedSpeed() {
         return performance * Effort;
     }
-    public void StartReaction() {
+    public void StartReaction(long startTime) {
+        this.startTime = startTime;
         isProgress = true;
         reaction.StartReaction();
+        manufactureListener.OnStart(this);
     }
 
+    //be sure to rewind before call stop
     public void Stop() {
         isProgress = false;
         progressPercent = 0f;
+        manufactureListener.OnStop(this);
         if (OnStopListener != null) {
             OnStopListener.Invoke();
         }
@@ -45,5 +49,7 @@ public class Manufacture {
 
     public void Rewind(long nextTime) {
         //throw new NotImplementedException();
+
+        //manufactureListener.OnIterationsChanged(this,);
     }
 }
