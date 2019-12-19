@@ -5,13 +5,13 @@ using System.Text;
 
 [Serializable]
 public class Manufacture {
-
+    public const long TIME_IN_SEC = 10000000;
     public Reaction reaction;
     public long startTime;
     public float progressPercent;
     public bool isProgress;
 
-    private float performance = 3f* 10000000;
+    private float performance = 3f * TIME_IN_SEC;
 
     public float Effort = 0f;
 

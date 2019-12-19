@@ -123,7 +123,9 @@ public class DiscreteController : MonoBehaviour {
     }
 
     private long NextTimeChange(ResourceChange rc) {
-        return (long)(1 / rc.speed) + rc.startTime;
+        Debug.Log("NextTimeIncrement" + (long)(rc.speed));
+        Debug.Log("NextTimeChange" + ((long)(rc.speed) + rc.startTime));
+        return (long)(rc.speed) + rc.startTime;
     }
 
     void MoveToNextTime(long nextTime) {
@@ -156,7 +158,7 @@ public class DiscreteController : MonoBehaviour {
         }
 
         public int Value(long nextTime) {
-            return count * (int)Math.Floor((nextTime - startTime) * speed);
+            return count * (int)Math.Floor((nextTime - startTime) / speed);
         }
 
         public static int ListSum(List<ResourceChange> list, long nextTime) {
