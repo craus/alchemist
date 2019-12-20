@@ -42,6 +42,7 @@ public class Manufacture {
     public void Stop() {
         isProgress = false;
         progressPart = 0f;
+        //if(oldIsProgress)
         manufactureListener.OnStop(this);
         if (OnStopListener != null) {
             OnStopListener.Invoke();

@@ -9,8 +9,7 @@ public class DiscreteController : MonoBehaviour {
     bool loaded = false;
     bool stateChanged = false;
     bool speedChanged = false;
-
-    List<Manufacture> activeManufactureList;
+    
     //Map<Resource, List<ResourceChange>> map;
     long nextTime = NEVER;
     long currentTime;
@@ -19,6 +18,10 @@ public class DiscreteController : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         stateChanged = true;
+    }
+
+    private List<ReactionButton> GetActiveButtonsList() {
+        return GameManager.instance.reactionButtons.FindAll(b => b.slider.value > 0);
     }
 
     // Update is called once per frame
@@ -40,7 +43,7 @@ public class DiscreteController : MonoBehaviour {
         if (speedChanged) {
             RecalculteEffortOnSpeedChange();
         }
-        List<ReactionButton> activeList = GameManager.instance.reactionButtons.FindAll(b => b.slider.value > 0);
+        List<ReactionButton> activeList = GetActiveButtonsList();
         //TODO: order turn on depending proportion
         List<ReactionButton> toStartList = activeList.FindAll(b => !b.manufacture.isProgress).OrderByDescending(b => b.slider.value).ToList();
         toStartList.ForEach(b => {
@@ -54,7 +57,7 @@ public class DiscreteController : MonoBehaviour {
 
 
             if (activeList.Count > 0) {
-                ReInit(activeList);
+                CalculateProgress();
             } else {
                 nextTime = NEVER;
             }
@@ -74,15 +77,17 @@ public class DiscreteController : MonoBehaviour {
         speedChanged = true;
     }
 
-    private void ReInit(List<ReactionButton> activeList) {
+    private void CalculateProgress() {
         int counter = 0;
         bool inProgress;
         long nextTime = this.nextTime;
         do {
             inProgress = false;
-            activeManufactureList = activeList.Select(b => b.manufacture).Where(m => m.isProgress).ToList();
+            List<Manufacture> enabledManufactures = GetActiveButtonsList().Select(b => b.manufacture).ToList();
+            List<Manufacture> activeManufactureList = enabledManufactures.Where(m => m.isProgress).ToList();
             if (activeManufactureList.Count==0) {
                 //slider moved, but no reagents for reaction
+                enabledManufactures.ForEach(m => m.Stop());
                 nextTime = NEVER;
                 break;
             }
@@ -118,11 +123,10 @@ public class DiscreteController : MonoBehaviour {
                 if (nextTime < currentTime) {
                     bool speedChanged = false;
                     //changeState!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    activeManufactureList.ForEach(m => {
+                    enabledManufactures.ForEach(m => {
                         m.Rewind(nextTime);
                         if (m.reaction.reagents.Any(r => stateResources[r.Key] < 0)) {
                             m.Stop();
-                            activeManufactureList.Remove(m);
                             speedChanged = true;
                         }
                     });
