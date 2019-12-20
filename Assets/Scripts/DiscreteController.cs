@@ -81,7 +81,11 @@ public class DiscreteController : MonoBehaviour {
         do {
             inProgress = false;
             activeManufactureList = activeList.Select(b => b.manufacture).Where(m => m.isProgress).ToList();
-
+            if (activeManufactureList.Count==0) {
+                //slider moved, but no reagents for reaction
+                nextTime = NEVER;
+                break;
+            }
             //init
             //map = new Map<Resource, List<ResourceChange>>(() => new List<ResourceChange>());
 
