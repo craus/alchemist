@@ -49,7 +49,7 @@ public class Manufacture {
     }
 
     public long TimeToNextReaction() {
-        return lastTime + (long)(TIME_IN_SEC / EstimatedSpeed() * (1 - progressPart));
+        return lastTime + (long)Math.Ceiling(TIME_IN_SEC / EstimatedSpeed() * (1 - progressPart));
     }
 
     public delegate void OnStop();
@@ -59,7 +59,8 @@ public class Manufacture {
         if (deltaTime > 0) {
             double progress = EstimatedSpeed() * deltaTime / TIME_IN_SEC + progressPart;
             Debug.Log("progress " + progress);
-            int iterations = (int)(progress + EPSILON);
+            int iterations = (int)progress;
+            //int iterations = (int)(progress + EPSILON);
             progressPart = Math.Max(0d, progress - iterations);
             lastTime = nextTime;
             manufactureListener.OnIterationsChanged(this, iterations);
