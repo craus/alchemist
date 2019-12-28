@@ -44,8 +44,9 @@ public class GameManager : MonoBehaviour {
         });
         RefreshResourcesUI();
     }
-    public void RefreshResourcesAfterIdle() {
+    public void RefreshOnModelChange() {
         RefreshResources();
+        reactionButtons.ForEach(rb => rb.ProgressChanged());
     }
 
     private void RefreshResources() {
