@@ -50,7 +50,12 @@ public class Manufacture {
     }
 
     public long TimeToNextReaction() {
-        return lastTime + (long)Math.Ceiling(TIME_IN_SEC / EstimatedSpeed() * (1 - progressPart));
+        double deltaTime = Math.Ceiling(TIME_IN_SEC / EstimatedSpeed() * (1 - progressPart));
+        if (double.IsInfinity(deltaTime) || double.IsNaN(deltaTime) || deltaTime > DiscreteController.NEVER / 2) {
+            return DiscreteController.NEVER;
+        } else {
+            return lastTime + (long)deltaTime;
+        }
     }
 
     public delegate void OnStop();

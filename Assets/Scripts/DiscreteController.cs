@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Linq;
 
 public class DiscreteController : MonoBehaviour {
-    static readonly long NEVER = DateTime.MaxValue.Ticks;
+    public static readonly long NEVER = DateTime.MaxValue.Ticks;
     bool loaded = false;
     bool stateChanged = false;
     bool speedChanged = false;
