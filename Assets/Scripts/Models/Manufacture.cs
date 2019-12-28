@@ -31,6 +31,7 @@ public class Manufacture {
     public double EstimatedSpeed() {
         return performance * Effort;
     }
+
     public void StartReaction(long startTime) {
         this.lastTime = startTime;
         isProgress = true;

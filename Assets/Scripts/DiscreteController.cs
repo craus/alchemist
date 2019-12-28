@@ -83,11 +83,10 @@ public class DiscreteController : MonoBehaviour {
         long nextTime = this.nextTime;
         do {
             inProgress = false;
-            List<Manufacture> enabledManufactures = GetActiveButtonsList().Select(b => b.manufacture).ToList();
-            List<Manufacture> activeManufactureList = enabledManufactures.Where(m => m.isProgress).ToList();
+            List<Manufacture> activeManufactureList = GameManager.instance.reactionButtons.Select(b => b.manufacture).Where(m => m.isProgress).ToList();
             if (activeManufactureList.Count==0) {
                 //slider moved, but no reagents for reaction
-                enabledManufactures.ForEach(m => m.Stop());
+                //enabledManufactures.ForEach(m => m.Stop());
                 nextTime = NEVER;
                 break;
             }
@@ -123,7 +122,7 @@ public class DiscreteController : MonoBehaviour {
                 if (nextTime < currentTime) {
                     bool speedChanged = false;
                     //changeState!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    enabledManufactures.ForEach(m => {
+                    activeManufactureList.ForEach(m => {
                         m.Rewind(nextTime);
                         if (m.reaction.reagents.Any(r => stateResources[r.Key] < 0)) {
                             m.Stop();
