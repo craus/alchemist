@@ -65,7 +65,9 @@ public class Manufacture {
         long deltaTime = nextTime - lastTime;
         if (deltaTime > 0) {
             double progress = EstimatedSpeed() * deltaTime / TIME_IN_SEC + progressPart;
+#if (DEBUG_OUT)
             Debug.Log("progress " + progress);
+#endif
             int iterations = (int)progress;
             //int iterations = (int)(progress + EPSILON);
             progressPart = Math.Max(0d, progress - iterations);

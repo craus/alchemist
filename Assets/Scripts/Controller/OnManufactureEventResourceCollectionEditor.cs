@@ -19,9 +19,10 @@ class OnManufactureEventResourceCollectionEditor : ManufactureListener {
 
     void ManufactureListener.OnIterationsChanged(Manufacture m, int iterations) {
         if (iterations > 0) {
+#if (DEBUG_OUT)
             Debug.Log("reaction " + m.reaction.ToString());
             Debug.Log("iterations " + iterations);
-
+#endif
             m.reaction.reagents.ForEach(r => col[r.Key] -= (r.Value * iterations));
             m.reaction.products.ForEach(r => col[r.Key] += (r.Value * iterations));
         }
