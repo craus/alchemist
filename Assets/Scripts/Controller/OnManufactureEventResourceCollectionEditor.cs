@@ -6,6 +6,8 @@ using UnityEngine;
 
 class OnManufactureEventResourceCollectionEditor : ManufactureListener {
 
+    public Action ActionPerformed;
+
     ResourceCollection col;
 
     public OnManufactureEventResourceCollectionEditor(ResourceCollection col) {
@@ -15,6 +17,9 @@ class OnManufactureEventResourceCollectionEditor : ManufactureListener {
 
     void ManufactureListener.OnStart(Manufacture m) {
         m.reaction.reagents.ForEach(r => col[r.Key] -= r.Value);
+        if (ActionPerformed != null) {
+            ActionPerformed.Invoke();
+        }
     }
 
     void ManufactureListener.OnIterationsChanged(Manufacture m, int iterations) {
@@ -25,11 +30,19 @@ class OnManufactureEventResourceCollectionEditor : ManufactureListener {
 #endif
             m.reaction.reagents.ForEach(r => col[r.Key] -= (r.Value * iterations));
             m.reaction.products.ForEach(r => col[r.Key] += (r.Value * iterations));
+
+            if (ActionPerformed != null) {
+                ActionPerformed.Invoke();
+            }
         }
     }
 
 
     void ManufactureListener.OnStop(Manufacture m) {
         m.reaction.reagents.ForEach(r => col[r.Key] += r.Value);
+
+        if (ActionPerformed != null) {
+            ActionPerformed.Invoke();
+        }
     }
 }

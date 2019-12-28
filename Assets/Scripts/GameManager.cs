@@ -44,8 +44,10 @@ public class GameManager : MonoBehaviour {
         });
         RefreshResourcesUI();
     }
-    public void RefreshOnModelChange() {
-        RefreshResources();
+    public void RefreshOnModelChange(bool resourcesChanged) {
+        if (resourcesChanged) {
+            RefreshResources();
+        }
         reactionButtons.ForEach(rb => rb.ProgressChanged());
     }
 

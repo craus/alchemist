@@ -18,6 +18,8 @@ public class DiscreteController : MonoBehaviour {
     long currentTime;
     long stateStartTime;
     ResourceCollection stateResources;
+    bool resourcesChanged;
+
     // Start is called before the first frame update
     void Start() {
         stateChanged = true;
@@ -29,6 +31,7 @@ public class DiscreteController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        resourcesChanged = false;
         currentTime = DateTime.UtcNow.Ticks;
 
         if (!loaded) {
@@ -37,6 +40,9 @@ public class DiscreteController : MonoBehaviour {
             stateStartTime = currentTime;
             OnManufactureEventResourceCollectionEditor editor = new OnManufactureEventResourceCollectionEditor(GameManager.instance.game.currentResources);
             GameManager.instance.reactionButtons.ForEach(rb => rb.manufacture.manufactureListener = editor);
+            editor.ActionPerformed = () => {
+                resourcesChanged = true;
+            };
             //stateResources = GameManager.instance.game.currentResources;
         }
         stateResources = GameManager.instance.game.currentResources;
@@ -69,7 +75,7 @@ public class DiscreteController : MonoBehaviour {
 
             //the same. Assignment is unnecessary
             //GameManager.instance.game.currentResources = stateResources;
-            GameManager.instance.RefreshOnModelChange();
+            GameManager.instance.RefreshOnModelChange(resourcesChanged);
 #if (TURN_BASED)
         }
 #endif
