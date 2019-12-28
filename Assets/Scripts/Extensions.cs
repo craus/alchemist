@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
 
-public static class Extensions
-{
+public static class Extensions {
     public static int modulo(this int x, int y) {
         return (x % y + y) % y;
     }
@@ -306,6 +305,19 @@ public static class Extensions
         T result = default(T);
         foreach (T el in collection) {
             float cand = criteria(el);
+            if (cand < best) {
+                result = el;
+                best = cand;
+            }
+        }
+        return result;
+    }
+
+    public static T MinBy<T>(this IEnumerable<T> collection, Func<T, long> criteria) {
+        long best = long.MaxValue;
+        T result = default(T);
+        foreach (T el in collection) {
+            long cand = criteria(el);
             if (cand < best) {
                 result = el;
                 best = cand;
