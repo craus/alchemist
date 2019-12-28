@@ -814,6 +814,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   button: {fileID: 11461994}
   slider: {fileID: 1879807314306354687}
+  sliderInner: {fileID: 6941473960552089662}
   usedColor: {r: 1, g: 0.66, b: 1, a: 0.997}
   reaction:
     time: 0
@@ -2304,7 +2305,7 @@ GameObject:
   - component: {fileID: 2458673117194655047}
   - component: {fileID: 2586400128002662628}
   m_Layer: 5
-  m_Name: Fill
+  m_Name: FillInner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2327,7 +2328,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2458673117194655047
 CanvasRenderer:
@@ -2768,6 +2769,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: -5, y: 0}
-  m_SizeDelta: {x: -20, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}

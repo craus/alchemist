@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     public Button button;
     public Slider slider;
+    public Slider sliderInner;
     public Color usedColor;
     public Reaction reaction;
     public Transform formula;
@@ -80,5 +81,9 @@ public class ReactionButton : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     void OnDisable() {
         GameManager.instance.sliderEventHandler.RemoveSlider(slider);
+    }
+
+    public void ProgressChanged() {
+        sliderInner.value = (float)manufacture.progressPart;
     }
 }

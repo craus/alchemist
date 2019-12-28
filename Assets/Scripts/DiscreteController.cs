@@ -62,7 +62,7 @@ public class DiscreteController : MonoBehaviour {
 
             //the same. Assignment is unnecessary
             //GameManager.instance.game.currentResources = stateResources;
-            GameManager.instance.RefreshResourcesAfterIdle();
+            GameManager.instance.RefreshOnModelChange();
         }
     }
     private void RecalculteEffortOnSpeedChange() {
