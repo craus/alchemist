@@ -822,6 +822,14 @@ MonoBehaviour:
   formula: {fileID: 22448000}
   resourcePrefab: {fileID: 11409718, guid: 800186aa48135584d9edbf31c5ca99f9, type: 3}
   arrowPrefab: {fileID: 152862, guid: cac53882f2f3cae48965aa9e37c27bca, type: 3}
+  manufacture:
+    reaction:
+      time: 0
+      used: 0
+    lastTime: 0
+    progressPart: 0
+    isProgress: 0
+    Effort: 0
 --- !u!1 &124012
 GameObject:
   m_ObjectHideFlags: 0
